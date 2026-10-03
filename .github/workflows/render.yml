@@ -1,0 +1,91 @@
+name: render
+
+# Every 3 hours: started on time by the studio Worker's Cloudflare Cron Trigger
+# (a workflow_dispatch, like the studio's "Render now" button). GitHub's own
+# schedule below is only a backup — it often runs hours late or skips slots — so a
+# scheduled run first checks the data and stops if a render already ran recently.
+# Also straight after any change to the forecast code, widgets, settings or starter
+# layouts lands on main, and by hand.
+on:
+  schedule:
+    - cron: "7 */3 * * *"
+  push:
+    branches: [main]
+    paths:
+      - "pipeline/**"
+      - "web/**"
+      - "config/**"
+      - "layouts/**"
+      - "requirements.txt"
+  workflow_dispatch:
+
+permissions:
+  contents: read            # least privilege: the job never writes to the repo
+
+concurrency:
+  group: render
+  cancel-in-progress: false
+
+jobs:
+  # Tests run only when code has just landed on main (push). Scheduled runs and
+  # "Render now" / Run workflow skip them: nothing changed since the last green
+  # test, and skipping saves 2-3 minutes and Actions minutes.
+  # Nothing runs until you've finished setting up and created the repository variable
+  # SURF_FRAME_READY = true (Settings -> Secrets and variables -> Actions -> Variables).
+  test:
+    if: github.event_name == 'push' && vars.SURF_FRAME_READY == 'true'
+    uses: ./.github/workflows/test.yml
+
+  render:
+    needs: test
+    if: ${{ !cancelled() && vars.SURF_FRAME_READY == 'true' && (needs.test.result == 'success' || needs.test.result == 'skipped') }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    environment: production   # secrets live in this environment (restricted to main)
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install Python deps
+        run: pip install -r requirements.txt
+
+      # Backup schedule only: skip if the Cloudflare-triggered render already ran (data < 150 min old).
+      - name: Check whether data is already fresh
+        id: fresh
+        if: github.event_name == 'schedule'
+        env:
+          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          R2_BUCKET: ${{ secrets.R2_BUCKET }}
+        run: python -m pipeline.fresh --storage r2 --max-age-min 150
+
+      - name: Cache Chromium
+        if: steps.fresh.outputs.skip != 'true'
+        uses: actions/cache@v6
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('requirements.txt') }}
+
+      - name: Install Chromium
+        if: steps.fresh.outputs.skip != 'true'
+        run: python -m playwright install --with-deps chromium
+
+      - name: Fetch, render, upload
+        if: steps.fresh.outputs.skip != 'true'
+        env:
+          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          R2_BUCKET: ${{ secrets.R2_BUCKET }}
+          ADMIRALTY_KEY: ${{ secrets.ADMIRALTY_KEY }}
+          GMAIL_USER: ${{ secrets.GMAIL_USER }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          AERODATABOX_KEY: ${{ secrets.AERODATABOX_KEY }}   # optional: Flight widget lookups
+        run: python -m pipeline.main --storage r2

@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data: blob:; connect-src 'self'; base-uri 'none'; form-action 'none'">
+<title>Surf Frame Studio</title>
+<link rel="stylesheet" href="frame.css">
+<link rel="stylesheet" href="studio.css">
+</head>
+<body>
+
+<header class="bar">
+  <div class="brand"><span class="logo" aria-hidden="true"></span>Surf Frame Studio</div>
+  <div class="status" id="status">Loading…</div>
+  <div class="bar-actions">
+    <label class="frame-pick" id="frame-pick-wrap" hidden><span class="muted small">Frame</span>
+      <select id="frame-pick" aria-label="Which frame you're editing"></select></label>
+    <button id="btn-frame-settings" class="ghost" title="Edge margin for a tight mount, and your home town for weather">Frame settings</button>
+    <button id="btn-friends" class="ghost" hidden title="Add, change or remove friends' frames">Friends' frames</button>
+    <button id="btn-display" class="ghost" title="Tell the studio your screen size so it can show the frame at its real size">Screen size</button>
+    <button id="btn-render" class="ghost" title="Run the cloud render now">Render now</button>
+  </div>
+</header>
+
+<main>
+  <!-- Gallery -->
+  <section id="view-gallery" class="view">
+    <div class="gal-head">
+      <div>
+        <h1>Layouts</h1>
+        <p class="muted">Pick what the frame shows next time it wakes. Every layout is re-rendered with fresh data every 3 hours.</p>
+      </div>
+      <button id="btn-new" class="primary">New layout</button>
+    </div>
+    <div id="gallery" class="gallery"></div>
+  </section>
+
+  <!-- Editor -->
+  <section id="view-editor" class="view" hidden>
+    <div class="ed-bar">
+      <button id="btn-back" class="ghost">← Layouts</button>
+      <input id="layout-name" class="name-input" maxlength="60" aria-label="Layout name">
+      <div class="ed-tools">
+        <button id="btn-undo" class="ghost" title="Undo (Ctrl+Z)">Undo</button>
+        <label class="toggle"><input type="checkbox" id="tg-grid" checked> Grid</label>
+        <label class="toggle"><input type="checkbox" id="tg-eink"> E-ink pixels</label>
+        <label class="toggle" title="Show the frame at the exact physical size of the real display"><input type="checkbox" id="tg-real"> Real size</label>
+        <label class="toggle" id="tg-auto-wrap" hidden title="Preview the layout with the automatic Flight widget showing (as on the days before the flight)"><input type="checkbox" id="tg-auto" checked> Flight showing</label>
+        <button id="btn-save" class="ghost">Save</button>
+        <button id="btn-save-show" class="primary">Save &amp; show on frame</button>
+      </div>
+    </div>
+    <div class="ed">
+      <aside class="palette">
+        <h2>Add widget</h2>
+        <p class="muted small pal-hint">Pick the detail level (Full unless you change it), then click a widget to preview it before adding.</p>
+        <div id="palette"></div>
+      </aside>
+      <div class="stage-wrap" id="stage-wrap">
+        <div class="stage" id="stage">
+          <div id="paper"><div id="canvas" class="frame"></div></div>
+          <canvas id="eink" width="800" height="480" hidden></canvas>
+          <div id="grid" class="grid"></div>
+          <div id="overlay" class="overlay"></div>
+        </div>
+        <p class="hint muted">Drag to move · drag the corner to resize · arrows nudge (Shift = resize) · Delete removes · Ctrl+D duplicates</p>
+      </div>
+      <aside class="inspector" id="inspector"></aside>
+    </div>
+  </section>
+</main>
+
+<div id="display-dlg" class="modal" hidden>
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="dd-title">
+    <h2 id="dd-title">Your screen</h2>
+    <p class="muted small">Enter the screen you're using now. The studio then shows the frame at the real display's physical size (163 × 98 mm visible area).</p>
+    <div class="field"><label for="dd-diag">Screen size (diagonal, inches)</label><input id="dd-diag" type="number" min="5" max="100" step="0.1" placeholder="e.g. 15.6"></div>
+    <div class="field"><label for="dd-w">Resolution width (pixels)</label><input id="dd-w" type="number" min="320" max="16000" step="1"></div>
+    <div class="field"><label for="dd-h">Resolution height (pixels)</label><input id="dd-h" type="number" min="240" max="16000" step="1"></div>
+    <p class="muted small" id="dd-info"></p>
+    <p class="small"><b>Check it:</b> hold a bank card against the box below. If it doesn't match, nudge the screen size up (box too big) or down (box too small).</p>
+    <div class="card-check" id="dd-card"><span>85.6 × 54 mm</span></div>
+    <div class="insp-acts"><button id="dd-save" class="primary">Save</button><button id="dd-clear" class="ghost">Clear</button><button id="dd-close" class="ghost">Close</button></div>
+  </div>
+</div>
+
+<div id="settings-dlg" class="modal" hidden>
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="fs-title">
+    <h2 id="fs-title">Frame settings</h2>
+    <p class="muted small" id="fs-frame-name"></p>
+    <h3 class="dlg-h">Edge margin</h3>
+    <p class="muted small">If your frame's mount covers the edge of the screen, draw the picture a few pixels smaller so nothing is hidden. The picture shrinks evenly and a white border of this many pixels is left on every side.</p>
+    <div class="radio-row" id="fs-shrink" role="radiogroup" aria-label="Edge margin">
+      <label><input type="radio" name="fs-shrink" value="0"> None</label>
+      <label><input type="radio" name="fs-shrink" value="1"> 1 px</label>
+      <label><input type="radio" name="fs-shrink" value="2"> 2 px</label>
+      <label><input type="radio" name="fs-shrink" value="3"> 3 px</label>
+      <label><input type="radio" name="fs-shrink" value="custom"> Custom</label>
+      <input id="fs-shrink-custom" type="number" min="0" max="20" step="1" aria-label="Custom edge margin in pixels" disabled>
+    </div>
+    <h3 class="dlg-h">Button (KEY3)</h3>
+    <p class="muted small">Press the button on the frame to switch to this layout. Press it again, or wait for the next scheduled update, to go back. The new picture takes a few seconds to appear.</p>
+    <div class="field"><label for="fs-button">Button shows</label><select id="fs-button"></select></div>
+    <h3 class="dlg-h">Home town (for the weather widgets)</h3>
+    <p class="muted small">The Weather widgets can show a surf spot or your home. To find the numbers: open Google Maps, right-click your town, and click the two numbers at the top of the menu to copy them (the first is latitude, the second longitude).</p>
+    <div class="field"><label for="fs-home-name">Name</label><input id="fs-home-name" type="text" maxlength="40" placeholder="e.g. Cardiff"></div>
+    <div class="field"><label for="fs-home-lat">Latitude</label><input id="fs-home-lat" type="text" inputmode="decimal" placeholder="e.g. 51.4816"></div>
+    <div class="field"><label for="fs-home-lon">Longitude</label><input id="fs-home-lon" type="text" inputmode="decimal" placeholder="e.g. -3.1791"></div>
+    <p class="muted small" id="fs-home-note"></p>
+    <p class="small"><b>When does it change?</b> At the frame's next picture (every 3 hours), or press <b>Render now</b> and wait 3 minutes.</p>
+    <div class="insp-acts"><button id="fs-save" class="primary">Save</button><button id="fs-close" class="ghost">Close</button></div>
+  </div>
+</div>
+
+<div id="friends-dlg" class="modal" hidden>
+  <div class="modal-card wide" role="dialog" aria-modal="true" aria-labelledby="fr-title">
+    <h2 id="fr-title">Friends' frames</h2>
+    <p class="muted small">Each friend's frame has its own layouts, and they choose what it shows. Send them their <b>server address</b> (for the frame's Wi-Fi setup) and the studio link. Their email must also be on the Cloudflare Access list, or they can't log in.</p>
+    <p class="small warn-box" id="fr-warn" hidden></p>
+    <div id="fr-list" class="fr-list"></div>
+    <h3 class="dlg-h" id="fr-form-title">Add a frame</h3>
+    <div class="field"><label for="fr-name">Friend's name</label><input id="fr-name" type="text" maxlength="40" placeholder="e.g. Jack"></div>
+    <div class="field"><label for="fr-id">Frame ID (in the address)</label><input id="fr-id" type="text" maxlength="24" placeholder="e.g. jack"></div>
+    <div class="field"><label for="fr-emails">Email(s) they log in with</label><input id="fr-emails" type="text" maxlength="400" placeholder="jack@example.com"></div>
+    <p class="muted small">Frame ID: 2–24 lower-case letters, numbers or dashes. It can't be changed later. Separate several emails with commas.</p>
+    <div class="insp-acts"><button id="fr-save" class="primary">Add frame</button><button id="fr-cancel" class="ghost" hidden>Cancel edit</button><button id="fr-close" class="ghost">Close</button></div>
+  </div>
+</div>
+
+<div id="staging" class="modal" hidden>
+  <div class="modal-card stg-card" role="dialog" aria-modal="true" aria-labelledby="stg-title">
+    <h2 id="stg-title">Add widget</h2>
+    <p class="muted small">This is exactly how it will look on the frame. Resize it (drag the corner or use the size boxes) and set its options, then add it — it goes into the first free space big enough, not on top of anything.</p>
+    <div class="stg-body">
+      <div class="stg-view">
+        <div class="stg-canvas" id="stg-canvas">
+          <div id="stg-frame" class="frame stg-frame"></div>
+          <div class="stg-handle" id="stg-handle" title="Drag to resize"></div>
+        </div>
+      </div>
+      <div class="stg-side">
+        <div class="stg-size">
+          <label>Width <span class="stepper"><button type="button" data-stg="-1,0" aria-label="Narrower">−</button><input id="stg-w" type="number"><button type="button" data-stg="1,0" aria-label="Wider">+</button></span></label>
+          <label>Height <span class="stepper"><button type="button" data-stg="0,-1" aria-label="Shorter">−</button><input id="stg-h" type="number"><button type="button" data-stg="0,1" aria-label="Taller">+</button></span></label>
+          <button type="button" id="stg-def" class="ghost small">Default size</button>
+        </div>
+        <div id="stg-props"></div>
+        <p class="small" id="stg-info"></p>
+        <div class="insp-acts"><button id="stg-add" class="primary">Add to layout</button><button id="stg-cancel" class="ghost">Cancel</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+<script src="render-core.js"></script>
+<script src="studio.js"></script>
+</body>
+</html>

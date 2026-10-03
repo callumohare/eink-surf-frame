@@ -1,0 +1,63 @@
+{
+  "id": "big-simple",
+  "name": "Big & simple",
+  "spot": "saunton",
+  "mode": "4grey",
+  "threshold": 160,
+  "invert": false,
+  "widgets": [
+    {
+      "id": "w1",
+      "type": "header",
+      "x": 0,
+      "y": 0,
+      "w": 40,
+      "h": 3,
+      "props": {
+        "dateStyle": "short"
+      }
+    },
+    {
+      "id": "w2",
+      "type": "surf",
+      "x": 0,
+      "y": 3,
+      "w": 20,
+      "h": 13,
+      "props": {}
+    },
+    {
+      "id": "w3",
+      "type": "wind",
+      "x": 20,
+      "y": 3,
+      "w": 20,
+      "h": 7,
+      "props": {
+        "detail": "std"
+      }
+    },
+    {
+      "id": "w4",
+      "type": "quiver",
+      "x": 20,
+      "y": 10,
+      "w": 20,
+      "h": 6,
+      "props": {
+        "detail": "std"
+      }
+    },
+    {
+      "id": "w5",
+      "type": "outlook",
+      "x": 0,
+      "y": 16,
+      "w": 40,
+      "h": 8,
+      "props": {
+        "days": 5
+      }
+    }
+  ]
+}

@@ -1,0 +1,139 @@
+# Surf Forecast Frame — pipeline settings.
+# Everything here is safe to commit (no secrets). Secrets come from environment
+# variables / GitHub Actions secrets — see README.md.
+
+timezone = "Europe/London"
+
+[sources]
+# Surfline has no public API: the code uses the endpoints its website uses. Check its
+# terms of use before turning this on (they restrict automated access); it has refused
+# requests from GitHub since Sept 2026. Off by default — Open-Meteo is used instead.
+surfline = false
+
+[units]
+wave = "ft"       # ft | m — how surf and swell heights are shown (tides stay in metres)
+wind = "mph"      # mph | kph | kts
+temp = "C"
+
+[forecast]
+days = 5              # Surfline anonymous access may return fewer days; the pipeline copes
+interval_hours = 1    # 1-hourly gives better "best window" resolution
+outlook_days = 7      # days past Surfline's range are Open-Meteo estimates, shown with "~" in the outlook
+
+[home]
+# Where you live: used by the weather widgets when "Location" is set to Home.
+# Only the weather forecast (Open-Meteo) is fetched for it. Town-level is plenty:
+# right-click your town in Google Maps to copy its latitude and longitude.
+name = "Home"
+lat = 51.5072
+lon = -0.1276
+
+# ---------------------------------------------------------------------------
+# Spots. Surfline spot IDs were taken from each spot's surfline.com URL
+# (Saunton: /surf-report/saunton/5842041f4e65fad6a7708e10,
+#  Rest Bay: /surf-report/rest-bay/584204204e65fad6a77090d2).
+# facing_deg = compass direction the beach faces (out to sea). Used when
+# Surfline is unavailable, to classify wind as offshore/onshore and (with a
+# surf_model) to size swells that arrive at an angle. Estimates — tune them. ADMIRALTY station IDs: run  python -m pipeline.find_station porthcawl
+# and fill them in (left blank = fall back to Surfline / Open-Meteo tides).
+# ---------------------------------------------------------------------------
+[spots.saunton]
+name = "Saunton"
+surfline_id = "5842041f4e65fad6a7708e10"
+lat = 51.1183
+lon = -4.2253
+facing_deg = 275
+admiralty_station = "0535"        # e.g. Appledore or Ilfracombe — look up with find_station
+rules = "saunton"             # key into board_fin_rules.json
+tide_max_m = 9.0              # top of the tide chart's fixed scale (≈ biggest spring high tide). Approximate — adjust
+
+# Height formula used whenever surf comes from Open-Meteo (Surfline blocked, or outlook
+# days past Surfline's range):  top = swell x (a + b x peak period + c x |swell dir - facing|/90)
+# Fitted by  python -m pipeline.calibrate saunton  on 27 Sep 2026: 608 days of Saunton
+# Surfline history (Jan 2025 - Sep 2026). On unseen weeks: typical miss 0.7 ft, average
+# +0.1 ft, within 1/2 ft on 50% of days (the old generic formula: 0.9 ft / 44%).
+# Weakest on 5 ft+ days (reads about 0.4 ft low). c = 0 gives the simpler formula A.
+# A spot without this block uses the old generic guess.
+[spots.saunton.surf_model]
+a = 1.1323
+b = 0.0097
+c = -0.4641
+min_ratio = 0.65              # bottom of range / top (Surfline's Saunton bands average 0.65)
+
+[spots.rest_bay]
+name = "Rest Bay"
+surfline_id = "584204204e65fad6a77090d2"
+lat = 51.4880
+lon = -3.7280
+facing_deg = 250
+admiralty_station = "0512"        # Porthcawl — look up with find_station
+rules = "rest_bay"
+tide_max_m = 11.0             # Porthcawl springs are among the UK's biggest. Approximate — adjust
+
+# ---------------------------------------------------------------------------
+# Wetsuit choice: a winter suit and a summer suit. Put your own suits' names below.
+#   water <  hooded_below_c                      -> 4.5/3.5 hooded
+#   hooded_below_c <= water < hooded_below_c + marginal_band_c
+#       and (air feels-like < cold_air_c  or  wind >= windy_mph) -> 4.5/3.5 hooded
+#   otherwise                                     -> 3/2
+# ---------------------------------------------------------------------------
+[wetsuit]
+hooded_below_c = 14.0
+marginal_band_c = 1.5
+cold_air_c = 12.0
+windy_mph = 15.0
+hooded_name = "4.5/3.5 winter suit"
+summer_name = "3/2 summer suit"
+
+# ---------------------------------------------------------------------------
+# Board / fin selection modifiers (see board_fin_rules.json)
+# ---------------------------------------------------------------------------
+[quiver]
+punchy_period_s = 12
+weak_period_s = 8
+boundary_margin_ft = 0.4     # "near a band boundary" for the weak-wave rule
+
+# ---------------------------------------------------------------------------
+# The Wave, Bristol bookings (read from a dedicated Gmail inbox over IMAP).
+# sender_domains: only mail From these domains is parsed. VERIFY against a real
+# confirmation email — the booking system may send from a different domain.
+# setting_rules maps a session name to a key in board_fin_rules.json -> the_wave.
+# Only "advanced" and "advanced_plus" exist in the rules; the other mappings
+# are assumptions, edit them to taste.
+# ---------------------------------------------------------------------------
+[bookings]
+enabled = false        # true once you've set up the bookings inbox (see the setup guide)
+imap_host = "imap.gmail.com"
+lookback_days = 120
+sender_domains = ["thewave.com"]
+require_dkim = true
+max_messages = 60
+
+[bookings.setting_rules]
+"Intermediate" = "advanced"
+"Intermediate Plus" = "advanced"
+"Advanced" = "advanced"
+"Advanced Coaching" = "advanced"
+"Performance Coaching" = "advanced"
+"Mega Turns" = "advanced_plus"
+"Advanced Plus" = "advanced_plus"
+"Expert Turns" = "advanced_plus"
+"Expert" = "advanced_plus"
+"Expert Plus" = "advanced_plus"
+"Expert Barrels" = "advanced_plus"
+
+# ---------------------------------------------------------------------------
+# Wave map widget: NOAA GFS-Wave significant wave height + direction (free, no key).
+# The box is the area drawn (Mercator); the default fits the 40x21 map under a header.
+[map]
+enabled = true
+west = -28.0
+east = 14.0
+south = 47.65
+north = 60.5
+arrow_spacing = 40     # map units (800 across) between direction arrows
+
+[render]
+width = 800
+height = 480
+default_threshold = 160      # 1-bit threshold (0-255); higher = bolder text

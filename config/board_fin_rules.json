@@ -1,0 +1,101 @@
+{
+  "version": 1,
+  "notes": "EXAMPLE QUIVER — replace with your own boards and fins. Sizes are wave face height in feet. Choose the band using the TOP of the forecast range. Bands: lower bound inclusive, upper bound exclusive.",
+  "boards": {
+    "bp_mini": {
+      "name": "Fourth BP Mini 6'6\"",
+      "volume_l": 42,
+      "fin_system": "FCS II 5-fin",
+      "short": "BP Mini"
+    },
+    "flow_stik": {
+      "name": "Form Flow Stik 6'10\"",
+      "volume_l": 48,
+      "fin_system": "FCS II 5-fin",
+      "short": "Flow Stik"
+    }
+  },
+  "fin_setups": {
+    "perf_thruster_L": {
+      "label": "Performer thruster L",
+      "construction": "eco flex"
+    },
+    "perf_quad_M": {
+      "label": "Performer quad M",
+      "construction": "rears eco flex"
+    },
+    "perf_quad_Lfront_Mrear": {
+      "label": "Quad: Performer L fronts + M rears",
+      "construction": "eco flex fronts"
+    },
+    "twin_trailer": {
+      "label": "MR twins + trailer",
+      "construction": ""
+    },
+    "carver_thruster_L": {
+      "label": "Carver thruster L",
+      "owned": false
+    }
+  },
+  "rules": {
+    "saunton": [
+      {
+        "min_ft": 0,
+        "max_ft": 2,
+        "board": "flow_stik",
+        "fins": "perf_quad_M"
+      },
+      {
+        "min_ft": 2,
+        "max_ft": 4,
+        "board": "bp_mini",
+        "fins": "twin_trailer",
+        "alt": "perf_quad_M"
+      },
+      {
+        "min_ft": 4,
+        "max_ft": 5,
+        "board": "bp_mini",
+        "fins": "perf_thruster_L",
+        "alt": "twin_trailer",
+        "alt_condition": "clean"
+      },
+      {
+        "min_ft": 5,
+        "max_ft": 99,
+        "board": "flow_stik",
+        "fins": "perf_thruster_L",
+        "carver_upgrade": true
+      }
+    ],
+    "rest_bay": "same_as:saunton",
+    "the_wave": {
+      "note": "Chosen by session level, not forecast.",
+      "advanced": {
+        "board": "bp_mini",
+        "fins": "twin_trailer",
+        "alt": "perf_thruster_L"
+      },
+      "advanced_plus": {
+        "board": "flow_stik",
+        "fins": "perf_quad_Lfront_Mrear",
+        "alt": "perf_thruster_L",
+        "carver_upgrade": true
+      }
+    }
+  },
+  "modifiers": {
+    "punchy": {
+      "when": "swell period >= 12 s or reef",
+      "action": "prefer thruster option if one is listed"
+    },
+    "weak": {
+      "when": "swell period < 8 s or onshore/soft",
+      "action": "prefer quad/twin; near a band boundary use the smaller band"
+    },
+    "no_twin": "at 5 ft+ or hollow waves",
+    "no_quad": "hollow and overhead",
+    "fin_screws": "at 5 ft+"
+  },
+  "carver_upgrade_note": "If a Large Carver PC thruster is bought, it replaces perf_thruster_L where carver_upgrade is true, on open/walling waves. Keep the Performer for hollow or sectiony days."
+}

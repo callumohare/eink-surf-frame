@@ -1,0 +1,79 @@
+{
+  "id": "tides-light",
+  "name": "Tides & light \u00b7 Rest Bay",
+  "spot": "rest_bay",
+  "mode": "4grey",
+  "threshold": 160,
+  "invert": false,
+  "widgets": [
+    {
+      "id": "w1",
+      "type": "header",
+      "x": 0,
+      "y": 0,
+      "w": 40,
+      "h": 3,
+      "props": {}
+    },
+    {
+      "id": "w2",
+      "type": "tide_chart",
+      "x": 0,
+      "y": 3,
+      "w": 26,
+      "h": 11,
+      "props": {}
+    },
+    {
+      "id": "w3",
+      "type": "tide_times",
+      "x": 26,
+      "y": 3,
+      "w": 14,
+      "h": 11,
+      "props": {
+        "detail": "full"
+      }
+    },
+    {
+      "id": "w4",
+      "type": "sun",
+      "x": 0,
+      "y": 14,
+      "w": 20,
+      "h": 5,
+      "props": {}
+    },
+    {
+      "id": "w5",
+      "type": "water",
+      "x": 20,
+      "y": 14,
+      "w": 10,
+      "h": 5,
+      "props": {}
+    },
+    {
+      "id": "w6",
+      "type": "quiver",
+      "x": 30,
+      "y": 14,
+      "w": 10,
+      "h": 5,
+      "props": {
+        "detail": "std"
+      }
+    },
+    {
+      "id": "w7",
+      "type": "outlook",
+      "x": 0,
+      "y": 19,
+      "w": 40,
+      "h": 5,
+      "props": {
+        "days": 6
+      }
+    }
+  ]
+}

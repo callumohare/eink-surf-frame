@@ -1,0 +1,10 @@
+out/
+__pycache__/
+*.pyc
+.venv/
+.wrangler/
+node_modules/
+*.eml
+!tests/fixtures/*.eml
+.dev.vars
+secrets.yaml

@@ -1,0 +1,45 @@
+# Studio: gallery + layout editor. MUST be protected by Cloudflare Access
+# (Workers & Pages > surf-frame-studio > Access > Protect this Worker > All traffic).
+name = "surf-frame-studio"
+main = "src/index.js"
+compatibility_date = "2026-09-01"
+workers_dev = true
+preview_urls = false
+
+[assets]
+directory = "../../web"        # same renderer + UI files the cloud render uses
+binding = "ASSETS"
+run_worker_first = true        # every request (incl. static files) passes the auth check
+html_handling = "none"
+not_found_handling = "none"
+
+[[r2_buckets]]
+binding = "BUCKET"
+bucket_name = "surf-frame"
+
+[observability]
+enabled = true
+
+# Scheduled renders (UTC): start render.yml on GitHub every 3 hours at :07, because
+# GitHub's own schedule often runs hours late or skips slots. Needs the GH_TOKEN secret.
+# Keep in step with RENDER_MINUTE / REFRESH_HOURS in workers/frame-img/wrangler.toml.
+[triggers]
+crons = ["7 */3 * * *"]
+
+[vars]
+# Zero Trust team domain, e.g. "yourteam.cloudflareaccess.com"
+ACCESS_TEAM_DOMAIN = ""
+# Application Audience (AUD) tag of the Access app protecting this Worker
+ACCESS_AUD = ""
+# Comma-separated list of emails allowed in (checked again after Access)
+ALLOWED_EMAILS = ""
+# owner/repo of the private GitHub repo (for the optional "Render now" button)
+GH_REPO = ""          # e.g. "yourname/surf-frame"
+GH_REF = "main"
+# Friends' frames: what your own frame is called in the frame picker, and (only if the
+# studio can't work it out) the frame Worker's address, e.g. "https://surf-frame-img.you.workers.dev".
+MAIN_FRAME_NAME = "My frame"
+FRAME_IMG_ORIGIN = ""
+
+# Secret for "Render now" and the scheduled renders:  npx wrangler secret put GH_TOKEN
+# Secret for friends' frames (the SAME value on surf-frame-img):  npx wrangler secret put FRAME_SECRET

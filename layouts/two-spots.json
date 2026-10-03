@@ -1,0 +1,90 @@
+{
+  "id": "two-spots",
+  "name": "Both spots",
+  "spot": "saunton",
+  "mode": "4grey",
+  "threshold": 160,
+  "invert": false,
+  "widgets": [
+    {
+      "id": "w1",
+      "type": "header",
+      "x": 0,
+      "y": 0,
+      "w": 40,
+      "h": 3,
+      "props": {
+        "detail": "std"
+      }
+    },
+    {
+      "id": "w2",
+      "type": "spots_compare",
+      "x": 0,
+      "y": 3,
+      "w": 40,
+      "h": 5,
+      "props": {}
+    },
+    {
+      "id": "w3",
+      "type": "surf_chart",
+      "x": 0,
+      "y": 8,
+      "w": 20,
+      "h": 9,
+      "props": {
+        "spot": "saunton",
+        "hours": "48"
+      }
+    },
+    {
+      "id": "w4",
+      "type": "surf_chart",
+      "x": 20,
+      "y": 8,
+      "w": 20,
+      "h": 9,
+      "props": {
+        "spot": "rest_bay",
+        "hours": "48"
+      }
+    },
+    {
+      "id": "w6",
+      "type": "sun",
+      "x": 0,
+      "y": 17,
+      "w": 13,
+      "h": 6,
+      "props": {}
+    },
+    {
+      "id": "w7",
+      "type": "wetsuit",
+      "x": 13,
+      "y": 17,
+      "w": 13,
+      "h": 6,
+      "props": {}
+    },
+    {
+      "id": "w8",
+      "type": "booking",
+      "x": 26,
+      "y": 17,
+      "w": 14,
+      "h": 6,
+      "props": {}
+    },
+    {
+      "id": "w9",
+      "type": "credits",
+      "x": 0,
+      "y": 23,
+      "w": 40,
+      "h": 1,
+      "props": {}
+    }
+  ]
+}

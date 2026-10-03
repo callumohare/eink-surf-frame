@@ -1,0 +1,97 @@
+{
+  "id": "weather-surf",
+  "name": "Weather & surf",
+  "spot": "saunton",
+  "mode": "4grey",
+  "threshold": 160,
+  "invert": false,
+  "widgets": [
+    {
+      "id": "w1",
+      "type": "header",
+      "x": 0,
+      "y": 0,
+      "w": 40,
+      "h": 3,
+      "props": {}
+    },
+    {
+      "id": "w2",
+      "type": "weather",
+      "x": 0,
+      "y": 3,
+      "w": 12,
+      "h": 8,
+      "props": {}
+    },
+    {
+      "id": "w3",
+      "type": "weather_hours",
+      "x": 12,
+      "y": 3,
+      "w": 28,
+      "h": 8,
+      "props": {}
+    },
+    {
+      "id": "w4",
+      "type": "surf",
+      "x": 0,
+      "y": 11,
+      "w": 12,
+      "h": 7,
+      "props": {}
+    },
+    {
+      "id": "w5",
+      "type": "swell",
+      "x": 12,
+      "y": 11,
+      "w": 14,
+      "h": 7,
+      "props": {
+        "count": 2
+      }
+    },
+    {
+      "id": "w6",
+      "type": "tide_times",
+      "x": 26,
+      "y": 11,
+      "w": 14,
+      "h": 7,
+      "props": {
+        "detail": "std"
+      }
+    },
+    {
+      "id": "w7",
+      "type": "water",
+      "x": 0,
+      "y": 18,
+      "w": 12,
+      "h": 6,
+      "props": {}
+    },
+    {
+      "id": "w8",
+      "type": "wind",
+      "x": 12,
+      "y": 18,
+      "w": 14,
+      "h": 6,
+      "props": {
+        "detail": "std"
+      }
+    },
+    {
+      "id": "w9",
+      "type": "daylight",
+      "x": 26,
+      "y": 18,
+      "w": 14,
+      "h": 6,
+      "props": {}
+    }
+  ]
+}

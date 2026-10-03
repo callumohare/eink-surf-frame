@@ -1,0 +1,18 @@
+# Optional: rename to dependabot.yml in YOUR copy to get a weekly pull request when a
+# GitHub Action or Python package has an update (the tests run on each one).
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+    groups:
+      actions:
+        patterns: ["*"]
+  - package-ecosystem: pip
+    directory: "/"
+    schedule:
+      interval: weekly
+    groups:
+      python:
+        patterns: ["*"]

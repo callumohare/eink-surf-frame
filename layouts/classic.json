@@ -1,0 +1,108 @@
+{
+  "id": "classic",
+  "name": "Classic \u00b7 Saunton",
+  "spot": "saunton",
+  "mode": "4grey",
+  "threshold": 160,
+  "invert": false,
+  "widgets": [
+    {
+      "id": "w1",
+      "type": "header",
+      "x": 0,
+      "y": 0,
+      "w": 40,
+      "h": 3,
+      "props": {}
+    },
+    {
+      "id": "w2",
+      "type": "surf",
+      "x": 0,
+      "y": 3,
+      "w": 10,
+      "h": 8,
+      "props": {}
+    },
+    {
+      "id": "w3",
+      "type": "swell",
+      "x": 10,
+      "y": 3,
+      "w": 11,
+      "h": 4,
+      "props": {
+        "count": 2
+      }
+    },
+    {
+      "id": "w4",
+      "type": "wind",
+      "x": 10,
+      "y": 7,
+      "w": 11,
+      "h": 4,
+      "props": {
+        "detail": "std"
+      }
+    },
+    {
+      "id": "w5",
+      "type": "tide_chart",
+      "x": 21,
+      "y": 3,
+      "w": 19,
+      "h": 8,
+      "props": {}
+    },
+    {
+      "id": "w6",
+      "type": "surf_chart",
+      "x": 0,
+      "y": 11,
+      "w": 24,
+      "h": 8,
+      "props": {
+        "hours": "48"
+      }
+    },
+    {
+      "id": "w7",
+      "type": "quiver",
+      "x": 24,
+      "y": 11,
+      "w": 16,
+      "h": 4,
+      "props": {}
+    },
+    {
+      "id": "w8",
+      "type": "water",
+      "x": 24,
+      "y": 15,
+      "w": 8,
+      "h": 4,
+      "props": {}
+    },
+    {
+      "id": "w9",
+      "type": "best_windows",
+      "x": 32,
+      "y": 15,
+      "w": 8,
+      "h": 4,
+      "props": {}
+    },
+    {
+      "id": "w10",
+      "type": "outlook",
+      "x": 0,
+      "y": 19,
+      "w": 40,
+      "h": 5,
+      "props": {
+        "days": 6
+      }
+    }
+  ]
+}

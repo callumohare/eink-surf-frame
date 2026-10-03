@@ -1,0 +1,61 @@
+{
+  "id": "wave-pool-week",
+  "name": "Wave pool week",
+  "spot": "saunton",
+  "mode": "4grey",
+  "threshold": 160,
+  "invert": false,
+  "widgets": [
+    {
+      "id": "w1",
+      "type": "header",
+      "x": 0,
+      "y": 0,
+      "w": 40,
+      "h": 3,
+      "props": {}
+    },
+    {
+      "id": "w2",
+      "type": "countdown",
+      "x": 0,
+      "y": 3,
+      "w": 12,
+      "h": 9,
+      "props": {}
+    },
+    {
+      "id": "w3",
+      "type": "booking",
+      "x": 12,
+      "y": 3,
+      "w": 28,
+      "h": 9,
+      "props": {
+        "count": 3
+      }
+    },
+    {
+      "id": "w4",
+      "type": "outlook",
+      "x": 0,
+      "y": 12,
+      "w": 40,
+      "h": 6,
+      "props": {
+        "days": 7
+      }
+    },
+    {
+      "id": "w5",
+      "type": "surf_chart",
+      "x": 0,
+      "y": 18,
+      "w": 40,
+      "h": 6,
+      "props": {
+        "hours": "72"
+      }
+    }
+  ]
+}

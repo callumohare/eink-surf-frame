@@ -1,0 +1,59 @@
+name: test
+
+# Runs on every pull request (so you can see if a proposed change is safe before
+# merging), and is called by the render and deploy workflows before they do anything.
+on:
+  pull_request:
+  workflow_call:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      # UNVERIFIED action majors — pin to commit SHAs (Dependabot keeps them fresh).
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+
+      - name: Install Python deps
+        run: pip install -r requirements.txt
+
+      - name: Python tests (rules, wetsuit, bookings, layouts, validation)
+        run: python -m unittest discover -s tests -t . -v
+
+      - name: Worker tests (Access login check, device token, API)
+        run: node tests/workers.test.mjs
+
+      - name: Cache Chromium
+        uses: actions/cache@v6
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('requirements.txt') }}
+
+      - name: Install Chromium
+        run: python -m playwright install --with-deps chromium
+
+      - name: Render every layout with sample data (fails on any widget error)
+        run: python -m pipeline.main --sample --strict --out preview
+
+      - name: Upload preview pictures
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: preview-renders
+          path: preview/renders/*.png
+          retention-days: 7

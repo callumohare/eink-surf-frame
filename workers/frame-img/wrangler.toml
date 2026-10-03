@@ -1,0 +1,38 @@
+# Public, token-gated image endpoint for the frame. Do NOT put this Worker
+# behind Cloudflare Access (the ESP32 can't log in). If you enable
+# "Protect all Workers" at account level, add a Worker-level bypass for this one.
+name = "surf-frame-img"
+main = "src/index.js"
+compatibility_date = "2026-09-01"
+workers_dev = true
+preview_urls = false          # no *.workers.dev preview URLs for old versions
+
+[[r2_buckets]]
+binding = "BUCKET"
+bucket_name = "surf-frame"    # change if you named the bucket differently
+
+[observability]
+enabled = true
+
+# Optional per-IP rate limit (Workers Rate Limiting binding). UNVERIFIED syntax
+# for your wrangler version — check the Cloudflare docs before uncommenting.
+# [[ratelimits]]
+# name = "RATE_LIMITER"
+# namespace_id = "1001"
+#   [ratelimits.simple]
+#   limit = 20
+#   period = 60
+
+# When the TRMNL firmware wakes the frame: a little after each scheduled render.
+# Keep RENDER_MINUTE / REFRESH_HOURS in step with the studio Worker's Cron Trigger
+# (workers/studio/wrangler.toml) and the backup cron in .github/workflows/render.yml
+# ("7 */3 * * *" UTC). REFRESH_OFFSET_MIN allows for the render queueing and running (~3 min).
+[vars]
+REFRESH_HOURS = "3"
+RENDER_MINUTE = "7"
+REFRESH_OFFSET_MIN = "25"
+
+# Secrets (never in this file):
+#   npx wrangler secret put DEVICE_TOKEN   # 32+ random chars; the frame's key
+#   npx wrangler secret put DEVICE_MACS    # frame's Wi-Fi MAC, e.g. A1:B2:C3:D4:E5:F6 (comma-separate several)
+#   npx wrangler secret put FRAME_SECRET   # friends' frames: 32+ random chars, SAME value as on surf-frame-studio

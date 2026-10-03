@@ -1,0 +1,19 @@
+From: The Wave <bookings@thewave.com>
+To: Surfer <surfer@example.com>
+Subject: Your booking is confirmed - The Wave
+Date: Mon, 21 Sep 2026 19:02:11 +0100
+Message-ID: <synthetic-1@thewave.com>
+MIME-Version: 1.0
+Content-Type: text/html; charset="utf-8"
+
+<html><head><style>.x{color:red}</style></head><body>
+<h1>See you in the water!</h1>
+<p>Hi Surfer, thanks for booking with The Wave. Booking reference: TW-ABC123</p>
+<table>
+<tr><td>Session</td><td>Advanced Plus Surf Session</td></tr>
+<tr><td>Date</td><td>Saturday 3rd October 2026</td></tr>
+<tr><td>Time</td><td>08:00 - 09:00</td></tr>
+<tr><td>Price</td><td>&pound;75.00</td></tr>
+</table>
+<p>Please arrive 30 minutes before your session.</p>
+</body></html>
